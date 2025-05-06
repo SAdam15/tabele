@@ -1,0 +1,92 @@
+import random
+
+class Film:
+    def __init__(self, tytul, rok, gatunek, odtworzenia=0):
+        self.tytul = tytul
+        self.rok = rok
+        self.gatunek = gatunek
+        self.odtworzenia = odtworzenia
+
+    def play(self):
+        self.odtworzenia += 1
+
+    def __str__(self):
+        return f"{self.tytul} ({self.rok})"
+
+class Serial(Film):
+    def __init__(self, tytul, rok, gatunek, sezon, odcinek, odtworzenia=0):
+        super().__init__(tytul, rok, gatunek, odtworzenia)
+        self.sezon = sezon
+        self.odcinek = odcinek
+
+    def __str__(self):
+        return f"{self.tytul} S{self.sezon:02}E{self.odcinek:02}"
+
+# --- Biblioteka treści ---
+biblioteka = [
+    Film("Incepcja", 2010, "Sci-Fi"),
+    Film("Pulp Fiction", 1994, "Kryminalny"),
+    Serial("The Office", 2005, "Komedia", 2, 3),
+    Serial("Breaking Bad", 2008, "Dramat", 1, 1)
+]
+
+# --- Funkcje pomocnicze ---
+def get_movies():
+    return sorted(
+        [item for item in biblioteka if isinstance(item, Film) and not isinstance(item, Serial)],
+        key=lambda x: x.tytul
+    )
+
+def get_series():
+    return sorted(
+        [item for item in biblioteka if isinstance(item, Serial)],
+        key=lambda x: x.tytul
+    )
+
+def search(tytul_szukany):
+    return [item for item in biblioteka if tytul_szukany.lower() in item.tytul.lower()]
+
+def generate_views():
+    losowy_element = random.choice(biblioteka)
+    dodatkowe_odtworzenia = random.randint(1, 100)
+    losowy_element.odtworzenia += dodatkowe_odtworzenia
+    print(f"{losowy_element.tytul} - Dodano {dodatkowe_odtworzenia} odtworzeń!")
+
+def run_generate_views(liczba_rund=10):
+    for _ in range(liczba_rund):
+        generate_views()
+
+def top_titles(n=5, content_type=None):
+    if content_type == "film":
+        tytuly = [item for item in biblioteka if isinstance(item, Film) and not isinstance(item, Serial)]
+    elif content_type == "serial":
+        tytuly = [item for item in biblioteka if isinstance(item, Serial)]
+    else:
+        tytuly = biblioteka
+
+    tytuly_posortowane = sorted(tytuly, key=lambda x: x.odtworzenia, reverse=True)
+    return tytuly_posortowane[:n]
+
+# --- Główna część programu ---
+if __name__ == "__main__":
+    print("Wszystkie tytuły w bibliotece:")
+    for t in biblioteka:
+        print(t)
+
+    print("\nFilmy:")
+    for film in get_movies():
+        print(film)
+
+    print("\nSeriale:")
+    for serial in get_series():
+        print(serial)
+
+    run_generate_views(10)
+
+    print("\nNajpopularniejsze tytuły:")
+    for t in top_titles(3):
+        print(f"{t} - {t.odtworzenia} odtworzeń")
+
+    print("\nWynik wyszukiwania dla 'Office':")
+    for t in search("Office"):
+        print(t)
